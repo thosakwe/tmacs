@@ -4,10 +4,9 @@
 //
 // Use of this source code is governed by an
 // MIT-style license that can be found in the LICENSE file.
-#include "runtime/runtime.h"
+#ifndef TMACS_DEFS_H
+#define TMACS_DEFS_H
 
-int main() {
-    tmacs::Tmacs env;
-    env.Begin();
-    return env.GetExitCode();
-}
+#define KEY_ESC 27
+
+#endif //TMACS_DEFS_H

@@ -4,10 +4,15 @@
 //
 // Use of this source code is governed by an
 // MIT-style license that can be found in the LICENSE file.
-#include "runtime/runtime.h"
+#ifndef TMACS_TOOLBAR_H
+#define TMACS_TOOLBAR_H
 
-int main() {
-    tmacs::Tmacs env;
-    env.Begin();
-    return env.GetExitCode();
+namespace tmacs
+{
+    class Toolbar
+    {
+
+    };
 }
+
+#endif //TMACS_TOOLBAR_H
