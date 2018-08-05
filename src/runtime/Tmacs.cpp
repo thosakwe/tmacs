@@ -9,7 +9,7 @@
 
 tmacs::Tmacs::Tmacs() {
     initscr(); // Init
-    cbreak(); // Disable buffering
+    raw(); // Disable buffering
     keypad(stdscr, true); // Enable F1, F2, etc.
     noecho();
     getmaxyx(stdscr, maxY, maxX);

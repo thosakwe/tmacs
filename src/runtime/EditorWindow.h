@@ -18,6 +18,7 @@ namespace tmacs
     {
         enum Mode
         {
+            NONE,
             EDIT,
             COMMAND
         };
@@ -33,7 +34,7 @@ namespace tmacs
 
     private:
         std::ostringstream commandBuf;
-        Mode mode = EDIT;
+        Mode mode = NONE;
         int prev;
         int maxX, maxY;
         Tmacs *env;

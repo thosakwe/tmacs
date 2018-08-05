@@ -14,6 +14,8 @@ tmacs::EditorWindow::EditorWindow(Tmacs *env, WINDOW *wnd) {
     //box(wnd, 0, 0);
     FindPositions();
     ChangeMode(EDIT);
+    wmove(wnd, 0, 0);
+    wrefresh(wnd);
 }
 
 tmacs::EditorWindow::~EditorWindow() {
@@ -64,14 +66,12 @@ void tmacs::EditorWindow::HandleKeyInCommandMode(chtype ch) {
 }
 
 void tmacs::EditorWindow::ChangeMode(tmacs::EditorWindow::Mode newMode) {
-    if (newMode != mode) {
-        mode = newMode;
+    mode = newMode;
 
-        if (mode == EDIT) {
-            PrintModeName("EDIT");
-        } else {
-            PrintModeName(nullptr);
-        }
+    if (mode == EDIT) {
+        PrintModeName("EDIT");
+    } else {
+        PrintModeName(nullptr);
     }
 }
 
@@ -81,9 +81,9 @@ void tmacs::EditorWindow::PrintModeName(const char *name) {
 
     // Clear the bottom line
     FindPositions();
-    wmove(wnd, maxY, 0);
+    wmove(wnd, maxY + 1, 0);
     wclrtoeol(wnd);
-    wmove(wnd, maxY, 0);
+    wmove(wnd, maxY + 1, 0);
 
     if (name != nullptr) {
         wattron(wnd, A_BOLD);
@@ -91,9 +91,8 @@ void tmacs::EditorWindow::PrintModeName(const char *name) {
         wprintw(wnd, name);
         wprintw(wnd, " --");
         wattroff(wnd, A_BOLD);
-    } else {
-        wprintw(wnd, "Hmmm");
     }
 
     wmove(wnd, originalY, originalX);
+    wrefresh(wnd);
 }
