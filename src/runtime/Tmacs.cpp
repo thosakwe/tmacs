@@ -10,12 +10,12 @@
 tmacs::Tmacs::Tmacs() {
     initscr(); // Init
     raw(); // Disable buffering
+    //cbreak();
     keypad(stdscr, true); // Enable F1, F2, etc.
     noecho();
     getmaxyx(stdscr, maxY, maxX);
     //printw("width: %d, height: %d\n", maxX, maxY);
     refresh();
-    //getch();
 }
 
 tmacs::Tmacs::~Tmacs() {

@@ -60,29 +60,48 @@ tmacs::EditorWindow::Mode tmacs::EditorWindow::GetMode() const {
 }
 
 void tmacs::EditorWindow::FindPositions() {
+    //initscr();
     getmaxyx(wnd, maxY, maxX);
 }
 
 void tmacs::EditorWindow::HandleKey(chtype ch) {
-    if (mode == EDIT) {
+    int y, x;
+    FindPositions();
+    //ChangeMode(mode);
+
+    if (ch == KEY_UP) {
+        getyx(wnd, y, x);
+        wmove(wnd, y - 1, x);
+    } else if (ch == KEY_DOWN) {
+        getyx(wnd, y, x);
+        wmove(wnd, y + 1, x);
+    } else if (ch == KEY_LEFT) {
+        getyx(wnd, y, x);
+        wmove(wnd, y, x - 1);
+    } else if (ch == KEY_RIGHT) {
+        getyx(wnd, y, x);
+        wmove(wnd, y, x + 1);
+    } else if (mode == EDIT) {
         HandleKeyInEditMode(ch);
+        PrintModeName("EDIT");
     } else if (mode == COMMAND) {
         HandleKeyInCommandMode(ch);
+        PrintModeName(nullptr);
     }
 
     prev = ch;
+    wrefresh(wnd);
 }
 
 void tmacs::EditorWindow::HandleKeyInEditMode(chtype ch) {
     if (ch == KEY_ESC) {
         // Switch to command mode
         ChangeMode(COMMAND);
+    } else if (ch == KEY_BACKSPACE) {
+        wprintw(wnd, "\b");
     } else {
         waddch(wnd, ch);
     }
-
-    PrintModeName("EDIT");
-    wrefresh(wnd);
 }
 
 void tmacs::EditorWindow::HandleKeyInCommandMode(chtype ch) {
@@ -91,16 +110,18 @@ void tmacs::EditorWindow::HandleKeyInCommandMode(chtype ch) {
     if (!strcmp(name, "^W") || !strcmp(name, "^w")) {
         // CTRL-W, close the window
         env->Close(this);
+    } else if (ch == KEY_ENTER || ch == 10) {
+        // TODO:: Execute the current command
+        commandBuf.clear();
+    } else if (commandBuf.str().empty() && (ch == 'e' || ch == 'E')) {
+        // Return to edit mode
+        ChangeMode(EDIT);
     } else {
-
-        if (ch == KEY_ENTER) {
-            // Execute the current command
-
-        } else if (ch == 'e' || ch == 'E') {
-            // Return to edit mode
-            ChangeMode(EDIT);
-        }
+        commandBuf.put((char) ch);
+        PrintModeName(nullptr);
+        wrefresh(wnd);
     }
+
 }
 
 void tmacs::EditorWindow::ChangeMode(tmacs::EditorWindow::Mode newMode) {
@@ -119,16 +140,19 @@ void tmacs::EditorWindow::PrintModeName(const char *name) {
 
     // Clear the bottom line
     FindPositions();
-    wmove(wnd, maxY, 0);
+    wmove(wnd, maxY - 1, 0);
     wclrtoeol(wnd);
-    wmove(wnd, maxY, 0);
 
     if (name != nullptr) {
+        wmove(wnd, maxY - 1, 0);
         wattron(wnd, A_BOLD);
         wprintw(wnd, "-- ");
         wprintw(wnd, name);
         wprintw(wnd, " --");
         wattroff(wnd, A_BOLD);
+    } else {
+        wmove(wnd, maxY - 1, 0);
+        wprintw(wnd, "> %s", commandBuf.str().c_str());
     }
 
     wmove(wnd, originalY, originalX);
