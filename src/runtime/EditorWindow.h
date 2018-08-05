@@ -9,6 +9,7 @@
 
 #include <ncurses.h>
 #include <sstream>
+#include "JSEngine.h"
 
 namespace tmacs
 {
@@ -16,6 +17,8 @@ namespace tmacs
 
     class EditorWindow
     {
+
+    public:
         enum Mode
         {
             NONE,
@@ -23,8 +26,9 @@ namespace tmacs
             COMMAND
         };
 
-    public:
         explicit EditorWindow(Tmacs *env, WINDOW *wnd);
+
+        Mode GetMode() const;
 
         void FindPositions();
 
@@ -34,6 +38,7 @@ namespace tmacs
 
     private:
         std::ostringstream commandBuf;
+        JSEngine *js;
         Mode mode = NONE;
         int prev;
         int maxX, maxY;

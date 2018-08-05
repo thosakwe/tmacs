@@ -13,6 +13,9 @@ tmacs::Tmacs::Tmacs() {
     keypad(stdscr, true); // Enable F1, F2, etc.
     noecho();
     getmaxyx(stdscr, maxY, maxX);
+    //printw("width: %d, height: %d\n", maxX, maxY);
+    refresh();
+    //getch();
 }
 
 tmacs::Tmacs::~Tmacs() {
@@ -44,6 +47,13 @@ void tmacs::Tmacs::End(int exitCode) {
 tmacs::EditorWindow *tmacs::Tmacs::NewWindow(int height, int width, int startY, int startX) {
     auto *w = newwin(height, width, startY, startX);
     auto *wnd = new EditorWindow(this, w);
+
+    // If an initialization error occurred, delete the window.
+    if (wnd->GetMode() == EditorWindow::Mode::NONE) {
+        delete wnd;
+        return nullptr;
+    }
+
     windows.push_back(wnd);
     return wnd;
 }

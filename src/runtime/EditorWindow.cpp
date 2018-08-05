@@ -4,14 +4,47 @@
 //
 // Use of this source code is governed by an
 // MIT-style license that can be found in the LICENSE file.
+#include <cstdlib>
+#include <fstream>
+#include <sstream>
 #include "defs.h"
 #include "EditorWindow.h"
 #include "Tmacs.h"
 
 tmacs::EditorWindow::EditorWindow(Tmacs *env, WINDOW *wnd) {
     this->env = env;
+    this->js = new JSEngine(this, wnd);
     this->wnd = wnd;
-    //box(wnd, 0, 0);
+
+    // Execute ~/.tmacs, if it exists.
+    std::ostringstream rcName;
+
+#ifdef WIN32
+    rcName << std::getenv("USERPROFILE") << "\\";
+#else
+    rcName << std::getenv("HOME") << "/";
+#endif
+
+    rcName << ".tmacs";
+
+    auto *rcNameStr = rcName.str().c_str();
+    std::ifstream ifs(rcNameStr);
+
+    if (ifs) {
+        std::stringstream contents;
+        contents << ifs.rdbuf();
+
+        auto *err = js->Eval(contents.str().c_str());
+
+        if (err != nullptr) {
+            mvwprintw(wnd, 0, 0, "JS Error: %s\n", err);
+            wrefresh(wnd);
+            getch();
+            return;
+        }
+    }
+
+    // Window stuff
     FindPositions();
     ChangeMode(EDIT);
     wmove(wnd, 0, 0);
@@ -20,6 +53,10 @@ tmacs::EditorWindow::EditorWindow(Tmacs *env, WINDOW *wnd) {
 
 tmacs::EditorWindow::~EditorWindow() {
     delwin(wnd);
+}
+
+tmacs::EditorWindow::Mode tmacs::EditorWindow::GetMode() const {
+    return mode;
 }
 
 void tmacs::EditorWindow::FindPositions() {
@@ -44,6 +81,7 @@ void tmacs::EditorWindow::HandleKeyInEditMode(chtype ch) {
         waddch(wnd, ch);
     }
 
+    PrintModeName("EDIT");
     wrefresh(wnd);
 }
 
@@ -81,9 +119,9 @@ void tmacs::EditorWindow::PrintModeName(const char *name) {
 
     // Clear the bottom line
     FindPositions();
-    wmove(wnd, maxY + 1, 0);
+    wmove(wnd, maxY, 0);
     wclrtoeol(wnd);
-    wmove(wnd, maxY + 1, 0);
+    wmove(wnd, maxY, 0);
 
     if (name != nullptr) {
         wattron(wnd, A_BOLD);
