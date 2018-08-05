@@ -49,6 +49,8 @@ namespace tmacs
          */
         EditorWindow *NewWindow(int height, int width, int startY = 0, int startX = 0);
 
+        void Close(EditorWindow *wnd);
+
     private:
         std::vector<EditorWindow *> windows;
         EditorWindow *currentWindow = nullptr;

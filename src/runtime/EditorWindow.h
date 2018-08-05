@@ -25,21 +25,27 @@ namespace tmacs
     public:
         explicit EditorWindow(Tmacs *env, WINDOW *wnd);
 
+        void FindPositions();
+
         ~EditorWindow();
 
         void HandleKey(chtype ch);
-
 
     private:
         std::ostringstream commandBuf;
         Mode mode = EDIT;
         int prev;
+        int maxX, maxY;
         Tmacs *env;
         WINDOW *wnd;
 
         void HandleKeyInEditMode(chtype ch);
 
         void HandleKeyInCommandMode(chtype ch);
+
+        void ChangeMode(Mode newMode);
+
+        void PrintModeName(const char *name);
     };
 }
 

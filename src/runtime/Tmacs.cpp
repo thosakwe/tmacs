@@ -4,6 +4,7 @@
 //
 // Use of this source code is governed by an
 // MIT-style license that can be found in the LICENSE file.
+#include <algorithm>
 #include "Tmacs.h"
 
 tmacs::Tmacs::Tmacs() {
@@ -45,4 +46,9 @@ tmacs::EditorWindow *tmacs::Tmacs::NewWindow(int height, int width, int startY, 
     auto *wnd = new EditorWindow(this, w);
     windows.push_back(wnd);
     return wnd;
+}
+
+void tmacs::Tmacs::Close(tmacs::EditorWindow *wnd) {
+    windows.erase(std::remove(windows.begin(), windows.end(), wnd), windows.end());
+    delete wnd;
 }
